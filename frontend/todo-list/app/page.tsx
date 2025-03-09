@@ -1,12 +1,13 @@
-import Image from "next/image";
 import styles from "./page.module.css";
+import ToDoForm from "./ToDoForm";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
+    <div>
       <main className={styles.main}>
         TODO List
       </main>
+      <ToDoForm/>
     </div>
   );
 }

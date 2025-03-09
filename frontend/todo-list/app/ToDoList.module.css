@@ -1,0 +1,52 @@
+.list{
+  padding: 10px;
+  margin-top: 10px;
+
+}
+.listItem{
+  
+  list-style-type: none;
+  border: 1px solid #ccc;
+  font-size: 24px;
+  padding-left: 5px;
+  margin-top: 10px;
+  padding: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  justify-content: center;
+  position:relative
+}
+.overflowDiv{
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  height:100vh;
+  word-wrap: break-word;
+}
+.deleteButton{
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.editButton{
+  position: absolute;
+  bottom: 5px;
+  right: 30px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+.deleteButton:hover{
+  color: red;
+}
+.editButton:hover{
+  color:dodgerblue;
+}
