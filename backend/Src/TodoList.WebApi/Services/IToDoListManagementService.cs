@@ -7,5 +7,6 @@ namespace TodoList.WebApi.Services
     {
         List<ToDoListAssignmentDTO> GetAllAssignemnts();
         Task <ToDoListAssignmentDTO> AddNewToDoAssignment(ToDoListAssignmentDTO toDoDto);
+        bool DeleteAssignmentFromToDo(int id);
     }
 }

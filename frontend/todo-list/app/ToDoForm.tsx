@@ -13,7 +13,6 @@ const ToDoForm = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(noteValue)
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNoteValue({...noteValue,[e.target.name]:e.target.value})

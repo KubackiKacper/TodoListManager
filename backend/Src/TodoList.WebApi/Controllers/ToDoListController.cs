@@ -30,5 +30,16 @@ namespace TodoList.WebApi.Controllers
             }
             return Ok(response);
         }
+        [HttpDelete]
+        [Route("todo/assignments/delete")]
+        public IActionResult DeleteToDo (int id)
+        {
+            var response = _service.DeleteAssignmentFromToDo(id);
+            if (response == null)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
     }
 }

@@ -37,5 +37,16 @@ namespace TodoList.WebApi.Services
                 Description = addToDo.Description
             };
         }
+        public bool DeleteAssignmentFromToDo(int id) 
+        {
+            ToDoListAssignment? removeToDo = _context.ToDoListAssignments.Find(id);
+            if (removeToDo == null)
+            {
+                throw new ArgumentException($"Could not find id: {id}");
+            }
+            _context.ToDoListAssignments.Remove(removeToDo);
+            _context.SaveChanges();
+            return true;
+        }
     }
 }
