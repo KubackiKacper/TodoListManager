@@ -4,87 +4,25 @@ import styles from './ToDoList.module.css'
 import apiUrls from '@/urlList'
 import { FaTrash } from "react-icons/fa6";
 import { FaRegEdit,FaRegSave  } from "react-icons/fa";
-import notify from './notify';
+import notify, { TypeEnum } from './notify';
 import { MdOutlineCancel } from "react-icons/md";
+import { IToDoActions } from './ToDoForm';
 
 
-export interface IApiDataProps{
+export type ToDoProps ={
   id:number,
   description:string
 }
-export const timeout = (delay: number)=>{
-  return new Promise( res => setTimeout(res, delay) );
-}
-const ToDoList = () => {
-  const [apiData, setApiData] = useState<IApiDataProps[]>([])
+
+
+const ToDoList = (props:IToDoActions) => {
+  
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [editedNote, setEditedNote] = useState<IApiDataProps | null>(null);
-  const [editedDescription, setEditedDescription] = useState<string>('');
   
-  
-  useEffect(()=>
-    {
-      fetchFromApi()
-    },[]
-    )
-  
-  const fetchFromApi = async () =>{
-    try{
-      const response =  await fetch(apiUrls.toDoListUrl.urlLink)
-      const data = await response.json();
-      setApiData(data)
-      }
-    catch(error)
-    {
-      console.error("Failed while fetching data")
-    }
-  }
-  const handleEditClick = (item: IApiDataProps) => {
-    setEditedNote(item);
-    setEditedDescription(item.description);
-    setIsDialogOpen(true);
-  };
+  const [editedItem, setEditedItem] = useState<ToDoProps>();
+ 
   const handleCancelClick = () => {
     setIsDialogOpen(false);
-  };
-  const handleDelete = async (id:number) => {
-    try {
-          const response = await fetch(`${apiUrls.deleteToDoItemUrl.urlLink}${id}`, { 
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-          notify({type:"warn",message:"Item deleted successfully!"});
-          fetchFromApi();
-            
-        } else {
-          notify({type:"error",message:"Could not delete the item."});
-        }
-    } catch (error) {
-        console.error("Wystąpił błąd:", error);
-    }
-  };
-  const handleSaveEdit = async () => {
-    if (!editedNote) return;
-
-    try {
-        const response = await fetch(`${apiUrls.updateToDoItemUrl.urlLink}${editedNote.id}`, {
-            method: 'PUT',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description: editedDescription })
-        });
-
-        if (response.ok) {
-            notify({ type: "info", message: "Note updated successfully!" });
-            setIsDialogOpen(false);
-            
-            fetchFromApi(); 
-        } else {
-            notify({ type: "error", message: "Could not update the item." });
-        }
-    } catch (error) {
-        console.error("Wystąpił błąd:", error);
-    }
   };
 
   return (
@@ -95,26 +33,38 @@ const ToDoList = () => {
           <h2>Edit Task</h2>
           <input
               type="text"
-              value={editedDescription}
-              onChange={(e) => setEditedDescription(e.target.value)}
+              value={editedItem?.description ?? ""}
+              onChange={(e) => setEditedItem({id:editedItem!.id,description:e.target.value})}
               className={styles.input}
           />
           <div>
-            <button type='button' onClick={handleSaveEdit} className={styles.saveButton}><FaRegSave /></button>
+            <button
+              type='button' 
+              onClick={() => {
+                props.onEdit(editedItem!);
+                setIsDialogOpen(false);
+              }} 
+              className={styles.saveButton}>
+                <FaRegSave />
+            </button>
             <button type='button' onClick={handleCancelClick} className={styles.closeButton}><MdOutlineCancel /></button>
           </div>
           
       </dialog>
       <ul className={styles.list}>
-        {apiData.map((item) => (
+        {props.items.map((item) => (
           
           <li 
             key={item.id} 
             className={styles.listItem} 
           >
             {item.description}
-            <button  type='button' className={styles.deleteButton} onClick={()=>handleDelete(item.id)}><FaTrash /></button>
-            <button  type='button' className={styles.editButton} onClick={() => handleEditClick(item)}><FaRegEdit /></button>
+            <button  type='button' className={styles.deleteButton} onClick={()=>props.onDelete(item.id)}><FaTrash /></button>
+            <button  type='button' className={styles.editButton} onClick={(e) => {
+              // e.nativeEvent.stopImmediatePropagation();
+              setEditedItem(item);
+              setIsDialogOpen(true);
+            }}><FaRegEdit /></button>
             
           </li>
           

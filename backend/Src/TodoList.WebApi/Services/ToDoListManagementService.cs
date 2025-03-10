@@ -2,28 +2,29 @@
 using TodoList.WebApi.Data;
 using TodoList.WebApi.Models;
 using TodoList.WebApi.DataTransferObjects;
+using Microsoft.EntityFrameworkCore;
 
 namespace TodoList.WebApi.Services
 
 {
-    public class ToDoListManagementService : IToDoListManagementService
+    public class ToDoService : IToDoService
     {
         private readonly ApplicationDbContext _context;
-        public ToDoListManagementService(ApplicationDbContext context) 
+        public ToDoService(ApplicationDbContext context) 
         {
             _context = context;
         }
         
-        public List<ToDoListAssignment> GetAllAssignemnts()
+        public async Task<GetToDoListAssignmentDTO[]> GetAll()
         {
-            List<ToDoListAssignment> response = _context.ToDoListAssignments.Select(toDo => new ToDoListAssignment
+            GetToDoListAssignmentDTO[] response = await _context.ToDoListAssignments.Select(toDo => new GetToDoListAssignmentDTO
             {
                 Id = toDo.Id,
                 Description= toDo.Description
-            }).ToList();
+            }).ToArrayAsync();
             return response;
         }
-        public async Task <ToDoListAssignmentDTO> AddNewToDoAssignment(ToDoListAssignmentDTO toDoListAssignmentDTO)
+        public async Task <ToDoListAssignmentDTO> AddToDo(ToDoListAssignmentDTO toDoListAssignmentDTO)
         {
            
             ToDoListAssignment addToDo = new ToDoListAssignment
@@ -38,27 +39,25 @@ namespace TodoList.WebApi.Services
                 Description = addToDo.Description
             };
         }
-        public bool DeleteAssignmentFromToDo(int id) 
+        public async Task <bool> DeleteToDo(int id) 
         {
-            ToDoListAssignment? removeToDo = _context.ToDoListAssignments.Find(id);
-            if (removeToDo == null)
+            ToDoListAssignment removeToDo = await _context.ToDoListAssignments.FindAsync(id);
+            if (removeToDo==null)
             {
-                return false;
+                throw new NullReferenceException($"Could not find id: {id} ");
             }
             _context.ToDoListAssignments.Remove(removeToDo);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<ToDoListAssignmentDTO?> UpdateToDoAssignment(int id, ToDoListAssignmentDTO toDoDto)
+        public async Task<ToDoListAssignmentDTO> UpdateToDo(int id, ToDoListAssignmentDTO toDoDto)
         {
-            var existingNote = await _context.ToDoListAssignments.FindAsync(id);
-
+            ToDoListAssignment existingNote = await _context.ToDoListAssignments.FindAsync(id);
             if (existingNote == null)
             {
-                return null;
+                throw new NullReferenceException($"Could not find id: {id} ");
             }
-
             existingNote.Description = toDoDto.Description;
             await _context.SaveChangesAsync();
 

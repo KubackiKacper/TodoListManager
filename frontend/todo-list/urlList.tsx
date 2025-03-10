@@ -5,18 +5,9 @@ interface IURLProps {
 }
 
 const apiUrls: IURLProps = {
-  toDoListUrl: {
-    urlLink: "https://localhost:7213/todo/assignments",
+  toDoApiUrl: {
+    urlLink: "https://localhost:7213/todo",
   },
-  deleteToDoItemUrl:{
-    urlLink: "https://localhost:7213/todo/assignments/delete?id="
-  },
-  addToDoItemUrl:{
-    urlLink: "https://localhost:7213/todo/assignments/add"
-  },
-  updateToDoItemUrl:{
-    urlLink: "https://localhost:7213/todo/assignments/update/"
-  }
 };
 
 export default apiUrls;

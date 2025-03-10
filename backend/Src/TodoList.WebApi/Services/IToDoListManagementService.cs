@@ -3,11 +3,11 @@ using TodoList.WebApi.DataTransferObjects;
 using TodoList.WebApi.Models;
 namespace TodoList.WebApi.Services
 {
-    public interface IToDoListManagementService
+    public interface IToDoService
     {
-        List<ToDoListAssignment> GetAllAssignemnts();
-        Task <ToDoListAssignmentDTO> AddNewToDoAssignment(ToDoListAssignmentDTO toDoDto);
-        Task<ToDoListAssignmentDTO> UpdateToDoAssignment(int id, ToDoListAssignmentDTO toDoDto);
-        bool DeleteAssignmentFromToDo(int id);
+        Task <GetToDoListAssignmentDTO[]> GetAll();
+        Task <ToDoListAssignmentDTO> AddToDo(ToDoListAssignmentDTO toDoDto);
+        Task <ToDoListAssignmentDTO> UpdateToDo(int id, ToDoListAssignmentDTO toDoDto);
+        Task <bool> DeleteToDo(int id);
     }
 }

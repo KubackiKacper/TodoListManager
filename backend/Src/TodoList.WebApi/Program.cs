@@ -19,7 +19,7 @@ namespace TodoList.WebApi
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source = ToDoListAssignment.db"));
 
-            builder.Services.AddScoped<IToDoListManagementService, ToDoListManagementService>();
+            builder.Services.AddScoped<IToDoService, ToDoService>();
             var app = builder.Build();
             app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseStaticFiles();

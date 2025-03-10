@@ -1,11 +1,16 @@
 import React from 'react'
 import { Bounce, toast } from 'react-toastify'
 
+export enum TypeEnum{
+  success,
+  info,
+  warn,
+  error
+}
 interface INotifyProps
 {
-  type:string,
-  message:string,
-  
+  type:TypeEnum,
+  message:string|any,
 }
 const defaultOptions = {
   position: "top-left" as const,
@@ -21,16 +26,16 @@ const defaultOptions = {
 const notify = ({type,message}:INotifyProps) => {
   switch(type)
   {
-    case "info":
+    case TypeEnum.info:
       toast.info(message,defaultOptions)
       break;
-    case "success":
+    case TypeEnum.success:
       toast.success(message,defaultOptions)
       break;
-    case "warn":
+    case TypeEnum.warn:
       toast.warn(message,defaultOptions)
       break;
-    case "error":
+    case TypeEnum.error:
       toast.error(message,defaultOptions)
       break;  
     default:

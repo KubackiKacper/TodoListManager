@@ -3,9 +3,11 @@ using System.Text.Json.Serialization;
 
 namespace TodoList.WebApi.DataTransferObjects
 {
-    public class ToDoListAssignmentDTO
+    public class GetToDoListAssignmentDTO
     {
-        
+        [Key]
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
         [Required]
         [MaxLength(255)]
         [JsonPropertyName("description")]
