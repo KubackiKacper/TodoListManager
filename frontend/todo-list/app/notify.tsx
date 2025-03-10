@@ -9,7 +9,7 @@ interface INotifyProps
 }
 const defaultOptions = {
   position: "top-left" as const,
-  autoClose: 4000,
+  autoClose: 3000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
@@ -27,7 +27,7 @@ const notify = ({type,message}:INotifyProps) => {
     case "success":
       toast.success(message,defaultOptions)
       break;
-    case "warrning":
+    case "warn":
       toast.warn(message,defaultOptions)
       break;
     case "error":

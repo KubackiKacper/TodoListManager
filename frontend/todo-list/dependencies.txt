@@ -1,0 +1,4 @@
+npm install --dev @types/react
+npm i typescript-plugin-css-modules
+npm i react-icons
+npm i react-toastify

@@ -14,17 +14,18 @@ namespace TodoList.WebApi.Services
             _context = context;
         }
         
-        public List<ToDoListAssignmentDTO> GetAllAssignemnts()
+        public List<ToDoListAssignment> GetAllAssignemnts()
         {
-            List<ToDoListAssignmentDTO> response = _context.ToDoListAssignments.Select(toDoDTO => new ToDoListAssignmentDTO
+            List<ToDoListAssignment> response = _context.ToDoListAssignments.Select(toDo => new ToDoListAssignment
             {
-                Id= toDoDTO.Id,
-                Description= toDoDTO.Description
+                Id = toDo.Id,
+                Description= toDo.Description
             }).ToList();
             return response;
         }
         public async Task <ToDoListAssignmentDTO> AddNewToDoAssignment(ToDoListAssignmentDTO toDoListAssignmentDTO)
         {
+           
             ToDoListAssignment addToDo = new ToDoListAssignment
             {
                 Description = toDoListAssignmentDTO.Description
@@ -42,11 +43,29 @@ namespace TodoList.WebApi.Services
             ToDoListAssignment? removeToDo = _context.ToDoListAssignments.Find(id);
             if (removeToDo == null)
             {
-                throw new ArgumentException($"Could not find id: {id}");
+                return false;
             }
             _context.ToDoListAssignments.Remove(removeToDo);
             _context.SaveChanges();
             return true;
+        }
+
+        public async Task<ToDoListAssignmentDTO?> UpdateToDoAssignment(int id, ToDoListAssignmentDTO toDoDto)
+        {
+            var existingNote = await _context.ToDoListAssignments.FindAsync(id);
+
+            if (existingNote == null)
+            {
+                return null;
+            }
+
+            existingNote.Description = toDoDto.Description;
+            await _context.SaveChangesAsync();
+
+            return new ToDoListAssignmentDTO
+            {
+                Description = existingNote.Description
+            };
         }
     }
 }

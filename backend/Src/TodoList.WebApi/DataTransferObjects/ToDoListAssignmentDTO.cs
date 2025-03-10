@@ -1,8 +1,12 @@
-﻿namespace TodoList.WebApi.DataTransferObjects
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TodoList.WebApi.DataTransferObjects
 {
     public class ToDoListAssignmentDTO
     {
-        public int Id { get; set; }
+        
+        [Required]
+        [MaxLength(255)]
         public string Description { get; set; }
     }
 }

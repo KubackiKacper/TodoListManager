@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using TodoList.WebApi.DataTransferObjects;
 using TodoList.WebApi.Services;
 
@@ -21,15 +22,18 @@ namespace TodoList.WebApi.Controllers
 
         [HttpPost]
         [Route("todo/assignments/add")]
-        public async Task <IActionResult> AddToDo(ToDoListAssignmentDTO toDoListAssignmentDTO)
+        public async Task<IActionResult> AddToDo([FromBody] ToDoListAssignmentDTO toDoListAssignmentDTO)
         {
-            var response = await _service.AddNewToDoAssignment(toDoListAssignmentDTO);
-            if (response==null)
+
+            if (toDoListAssignmentDTO == null || string.IsNullOrWhiteSpace(toDoListAssignmentDTO.Description))
             {
-                return BadRequest(response);
+                return BadRequest("Invalid input: Description is required.");
             }
-            return Ok(response);
+
+            var response = await _service.AddNewToDoAssignment(toDoListAssignmentDTO);
+            return response == null ? BadRequest("Could not add item") : Ok(response);
         }
+
         [HttpDelete]
         [Route("todo/assignments/delete")]
         public IActionResult DeleteToDo (int id)
@@ -37,9 +41,28 @@ namespace TodoList.WebApi.Controllers
             var response = _service.DeleteAssignmentFromToDo(id);
             if (response == null)
             {
-                return BadRequest(response);
+                return NotFound(response);
             }
             return Ok(response);
+        }
+
+        [HttpPut]
+        [Route("todo/assignments/update/{id}")]
+        public async Task<IActionResult> UpdateToDo(int id, [FromBody] ToDoListAssignmentDTO toDoDto)
+        {
+            if (string.IsNullOrWhiteSpace(toDoDto.Description))
+            {
+                return BadRequest("Description cannot be empty.");
+            }
+
+            var updatedNote = await _service.UpdateToDoAssignment(id, toDoDto);
+
+            if (updatedNote == null)
+            {
+                return NotFound("Task not found.");
+            }
+
+            return Ok(updatedNote);
         }
     }
 }
