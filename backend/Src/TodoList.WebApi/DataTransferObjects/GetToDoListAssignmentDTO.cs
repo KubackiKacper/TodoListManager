@@ -12,5 +12,11 @@ namespace TodoList.WebApi.DataTransferObjects
         [MaxLength(255)]
         [JsonPropertyName("description")]
         public string Description { get; set; }
+        [Required]
+        [JsonPropertyName("createdDate")]
+        public DateTime CreatedDate { get; set; }
+        [Required]
+        [JsonPropertyName("completionStatus")]
+        public bool CompletionStatus { get; set; }
     }
 }

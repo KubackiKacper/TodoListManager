@@ -20,7 +20,10 @@ namespace TodoList.WebApi.Services
             GetToDoListAssignmentDTO[] response = await _context.ToDoListAssignments.Select(toDo => new GetToDoListAssignmentDTO
             {
                 Id = toDo.Id,
-                Description= toDo.Description
+                Description= toDo.Description,
+                CreatedDate = toDo.CreatedDate,
+                CompletionStatus = toDo.CompletionStatus,
+                
             }).ToArrayAsync();
             return response;
         }
@@ -29,14 +32,19 @@ namespace TodoList.WebApi.Services
            
             ToDoListAssignment addToDo = new ToDoListAssignment
             {
-                Description = toDoListAssignmentDTO.Description
+                Description = toDoListAssignmentDTO.Description,
+                CreatedDate = DateTime.Now,
+                CompletionStatus = false
+               
             };
             _context.ToDoListAssignments.Add(addToDo);
             await _context.SaveChangesAsync();
 
             return new ToDoListAssignmentDTO
             {
-                Description = addToDo.Description
+                Description = addToDo.Description,
+                CreatedDate = DateTime.Now,
+                CompletionStatus = false
             };
         }
         public async Task <bool> DeleteToDo(int id) 
@@ -53,17 +61,19 @@ namespace TodoList.WebApi.Services
 
         public async Task<ToDoListAssignmentDTO> UpdateToDo(int id, ToDoListAssignmentDTO toDoDto)
         {
-            ToDoListAssignment existingNote = await _context.ToDoListAssignments.FindAsync(id);
-            if (existingNote == null)
+            ToDoListAssignment existingTask = await _context.ToDoListAssignments.FindAsync(id);
+            if (existingTask == null)
             {
                 throw new NullReferenceException($"Could not find id: {id} ");
             }
-            existingNote.Description = toDoDto.Description;
+            existingTask.Description = toDoDto.Description;
+            existingTask.CompletionStatus = toDoDto.CompletionStatus;
             await _context.SaveChangesAsync();
 
             return new ToDoListAssignmentDTO
             {
-                Description = existingNote.Description
+                Description = existingTask.Description,
+                CompletionStatus = toDoDto.CompletionStatus
             };
         }
     }

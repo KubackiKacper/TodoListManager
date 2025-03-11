@@ -10,5 +10,10 @@ namespace TodoList.WebApi.Models
         [Required]
         [MaxLength(255)]
         public string Description { get; set; }
+
+        [Required]
+        public DateTime CreatedDate { get; set; }
+        [Required]
+        public bool CompletionStatus { get; set; }
     }
 }

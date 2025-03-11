@@ -6,7 +6,7 @@ interface IURLProps {
 
 const apiUrls: IURLProps = {
   toDoApiUrl: {
-    urlLink: "https://localhost:7213/todo",
+    urlLink: 'https://localhost:7213/todo',
   },
 };
 

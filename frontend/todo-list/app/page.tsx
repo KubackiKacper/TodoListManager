@@ -7,7 +7,7 @@ export default function Home() {
     <div>
       <ToastContainer/>
       <main className={styles.main}>
-        TODO List
+        ToDo List
       </main>
       <ToDoForm/>
     </div>

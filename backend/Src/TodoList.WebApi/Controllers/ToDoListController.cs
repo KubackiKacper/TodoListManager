@@ -25,7 +25,11 @@ namespace TodoList.WebApi.Controllers
         public async Task<IActionResult> Add([FromBody] ToDoListAssignmentDTO toDoListAssignmentDTO)
         {
             var response = await _service.AddToDo(toDoListAssignmentDTO);
-            return response == null ? BadRequest("Could not add item") : Ok(response);
+            if (response == null)
+            {
+                return BadRequest("Could not add item");
+            }
+            return Ok(response);
         }
 
         [HttpDelete]

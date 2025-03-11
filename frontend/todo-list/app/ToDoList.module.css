@@ -59,12 +59,14 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 10px;
-}
-.dialogBox input{
+  }
+.dialogBoxInput{
   padding: 10px;
   margin-top: 10px;
   font-size: 20px;
+  display: flex;
   width: 30vw;
+  
 }
 .dialogBox button{
   margin-top: 10px;
@@ -80,4 +82,7 @@
 }
 .closeButton:hover{
   color:red
+}
+.statusCheckBox{
+  margin-left: 10px;
 }
