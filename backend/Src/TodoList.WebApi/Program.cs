@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source = ToDoListAssignment.db"));
 
@@ -26,6 +27,7 @@ builder.Services.AddCors(c =>
 var app = builder.Build();
 app.UseStaticFiles();
 app.UseRouting();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

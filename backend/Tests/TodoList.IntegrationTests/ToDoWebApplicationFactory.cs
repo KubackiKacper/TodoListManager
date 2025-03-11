@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using TodoList.WebApi.Data;
 
 namespace TodoList.IntegrationTests
 {
-    public class CustomWebApplicationFactory<TProgram>
+    public class ToDoWebApplicationFactory<TProgram>
     : WebApplicationFactory<TProgram> where TProgram : class
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -30,7 +36,7 @@ namespace TodoList.IntegrationTests
                 // Create open SqliteConnection so EF won't automatically close it.
                 services.AddSingleton<DbConnection>(container =>
                 {
-                    var connection = new SqliteConnection("DataSource=:memory:");
+                    var connection = new SqliteConnection("Data Source= TestToDo.db");
                     connection.Open();
 
                     return connection;
@@ -41,6 +47,9 @@ namespace TodoList.IntegrationTests
                     var connection = container.GetRequiredService<DbConnection>();
                     options.UseSqlite(connection);
                 });
+                using var scope = services.BuildServiceProvider().CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.EnsureCreated(); // Tworzy schemat bazy, jeśli nie istnieje
             });
 
             builder.UseEnvironment("Development");
