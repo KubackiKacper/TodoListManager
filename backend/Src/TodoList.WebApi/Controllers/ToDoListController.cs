@@ -22,9 +22,9 @@ namespace TodoList.WebApi.Controllers
 
         [HttpPost]
         [Route("todo")]
-        public async Task<IActionResult> Add([FromBody] ToDoListAssignmentDTO toDoListAssignmentDTO)
+        public async Task<IActionResult> Add([FromBody] SaveToDoListAssignmentDTO saveToDoListAssignmentDTO)
         {
-            var response = await _service.AddToDo(toDoListAssignmentDTO);
+            var response = await _service.AddToDo(saveToDoListAssignmentDTO);
             if (response == null)
             {
                 return BadRequest("Could not add item");
@@ -42,7 +42,7 @@ namespace TodoList.WebApi.Controllers
 
         [HttpPut]
         [Route("todo/{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ToDoListAssignmentDTO toDoDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] SaveToDoListAssignmentDTO toDoDto)
         {
             var updatedNote = await _service.UpdateToDo(id, toDoDto);
 

@@ -5,9 +5,9 @@ namespace TodoList.WebApi.Services
 {
     public interface IToDoService
     {
-        Task <GetToDoListAssignmentDTO[]> GetAll();
-        Task <ToDoListAssignmentDTO> AddToDo(ToDoListAssignmentDTO toDoDto);
-        Task <ToDoListAssignmentDTO> UpdateToDo(int id, ToDoListAssignmentDTO toDoDto);
+        Task <ToDoListAssignmentDTO[]> GetAll();
+        Task <ToDoListAssignmentDTO> AddToDo(SaveToDoListAssignmentDTO toDoDto);
+        Task <SaveToDoListAssignmentDTO> UpdateToDo(int id, SaveToDoListAssignmentDTO toDoDto);
         Task <bool> DeleteToDo(int id);
     }
 }

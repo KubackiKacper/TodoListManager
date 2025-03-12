@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TodoList.WebApi.Data;
 using TodoList.WebApi.DataTransferObjects;
+using TodoList.WebApi.Models;
 
 namespace TodoList.IntegrationTests
 {
@@ -18,33 +19,61 @@ namespace TodoList.IntegrationTests
     public class ToDoScenarios: IClassFixture<ToDoWebApplicationFactory<Program>>
     {
         private readonly ToDoWebApplicationFactory<Program> _factory;
-        public HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
+        
         public ToDoScenarios(ToDoWebApplicationFactory<Program> factory)
         {
             _factory = factory;
             using var scope = _factory.Services.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             this._httpClient = _factory.CreateClient();
-            
+            _context.ToDoListAssignments.RemoveRange(_context.ToDoListAssignments);
+            _context.Database.ExecuteSqlRaw($"UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='{nameof(_context.ToDoListAssignments)}';");
+            _context.ToDoListAssignments.AddRange(
+                [
+                    new ToDoListAssignment { Id = 1, Description = "This is example ToDo task", CreatedDate= new DateTime(2025, 3, 11, 0, 0, 0), CompletionStatus = false},
+                    new ToDoListAssignment { Id = 2, Description = "This is example ToDo task 2", CreatedDate = new DateTime(2025, 3, 12, 0, 0, 0), CompletionStatus = true }
+                ]
+            );
+            _context.SaveChanges();
         }
 
         [Fact]
         public async Task GetAllToDos_ReturnResposneOkIfNotNull()
         {
-            
             HttpResponseMessage response = await _httpClient.GetAsync("todo");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var responseTodos = Newtonsoft.Json.JsonConvert.DeserializeObject<ToDoListAssignmentDTO[]>(await response.Content.ReadAsStringAsync());
+            responseTodos.Should().HaveCount(2);
+            responseTodos.Should().BeEquivalentTo(
+                [
+                    new ToDoListAssignment 
+                    { 
+                        Id = 1, 
+                        Description = "This is example ToDo task", 
+                        CreatedDate= new DateTime(2025, 3, 11, 0, 0, 0), 
+                        CompletionStatus = false
+                    },
+                    new ToDoListAssignment 
+                    { 
+                        Id = 2, 
+                        Description = "This is example ToDo task 2", 
+                        CreatedDate = new DateTime(2025, 3, 12, 0, 0, 0), 
+                        CompletionStatus = true }
+                ]
+            );
         }
 
         [Fact]
         public async Task CreateToDo_ReturnResponseOkIfCreated()
         {
-            
-            var newToDo = new ToDoListAssignmentDTO
+            using var scope = _factory.Services.CreateScope();
+            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var newToDo = new SaveToDoListAssignmentDTO
             {
                 Description = "testDescription",
-                CreatedDate = new DateTime(2025, 3, 12, 0, 0, 0),
-                CompletionStatus = true
+                CreatedDate = DateTime.Now,
+                CompletionStatus = false
             };
 
             var serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(newToDo);
@@ -52,98 +81,73 @@ namespace TodoList.IntegrationTests
 
             HttpResponseMessage response = await _httpClient.PostAsync("todo",content);
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            HttpResponseMessage getResponseAfterAdd = await _httpClient.GetAsync("todo");
-            getResponseAfterAdd.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var addedTodos = Newtonsoft.Json.JsonConvert.DeserializeObject<GetToDoListAssignmentDTO[]>(await getResponseAfterAdd.Content.ReadAsStringAsync());
-            var addedTask = addedTodos.FirstOrDefault(t => t.Description == newToDo.Description);
-
-            addedTask.Should().NotBeNull();
-            addedTask.Description.Should().Be("testDescription");
+            var addedTodo = Newtonsoft.Json.JsonConvert.DeserializeObject<ToDoListAssignmentDTO>(await response.Content.ReadAsStringAsync());
+            addedTodo.Should().NotBeNull();
+            addedTodo.Description.Should().Be("testDescription");
+            addedTodo.Id.Should().Be(3);
+            addedTodo.CompletionStatus.Should().Be(false);
+            ToDoListAssignment expectedToDo = _context.ToDoListAssignments
+                .FirstOrDefault(x => x.Id == addedTodo.Id)
+                .Should()
+                .NotBeNull()
+                .And
+                .BeOfType<ToDoListAssignment>()
+                .Subject;
             
+            expectedToDo.Description.Should().Be(addedTodo.Description);
+            expectedToDo.CompletionStatus.Should().Be(addedTodo.CompletionStatus);
+            expectedToDo.CreatedDate.Should().Be(addedTodo.CreatedDate);
         }
 
         [Fact]
         public async Task DeleteToDo_ReturnsOk()
         {
-            
-            var deleteToDo = new ToDoListAssignmentDTO
-            {
-                Description = "TestToDelete",
-                CreatedDate = new DateTime(2025, 3, 13, 0, 0, 0),
-                CompletionStatus = false
-            };
+            using var scope = _factory.Services.CreateScope();
+            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            var serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(deleteToDo);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage createResponse = await _httpClient.PostAsync("todo", content);
-            createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            HttpResponseMessage getResponse = await _httpClient.GetAsync("todo");
-            getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var todos = Newtonsoft.Json.JsonConvert.DeserializeObject<GetToDoListAssignmentDTO[]>(await getResponse.Content.ReadAsStringAsync());
-            var createdToDo = todos.FirstOrDefault(t => t.Description == "TestToDelete");
-            createdToDo.Should().NotBeNull();
-
-            HttpResponseMessage deleteResponse = await _httpClient.DeleteAsync($"todo/{createdToDo.Id}");
+            ToDoListAssignment deleteToDo = _context.ToDoListAssignments
+                .FirstOrDefault(t => t.Id == 2)
+                .Should().NotBeNull()
+                .And
+                .BeOfType<ToDoListAssignment>()
+                .Subject;
+            HttpResponseMessage deleteResponse = await _httpClient.DeleteAsync($"todo/{deleteToDo.Id}");
             deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            HttpResponseMessage getAfterDeleteResponse = await _httpClient.GetAsync("todo");
-            getAfterDeleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var todosAfterDelete = Newtonsoft.Json.JsonConvert.DeserializeObject<GetToDoListAssignmentDTO[]>(await getAfterDeleteResponse.Content.ReadAsStringAsync());
-            todosAfterDelete.Any(t => t.Id == createdToDo.Id).Should().BeFalse();
+            _context.ToDoListAssignments
+                .FirstOrDefault(t => t.Id == 2)
+                .Should().BeNull();
         }
 
         [Fact]
         public async Task UpdateToDo_ReturnsOk()
         {
+            using var scope = _factory.Services.CreateScope();
+            var _context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            var updateToDo = new ToDoListAssignmentDTO
-            {
-                Description = "TestToUpdate",
-                CreatedDate = new DateTime(2025, 3, 13, 0, 0, 0),
-                CompletionStatus = false
-            };
+            ToDoListAssignment updateToDo = _context.ToDoListAssignments
+                .FirstOrDefault(t => t.Id == 1)
+                .Should().NotBeNull()
+                .And
+                .BeOfType<ToDoListAssignment>()
+                .Subject;
 
-            var serializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(updateToDo);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-            HttpResponseMessage createResponse = await _httpClient.PostAsync("todo", content);
-            createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            HttpResponseMessage getResponse = await _httpClient.GetAsync("todo");
-            getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var todos = Newtonsoft.Json.JsonConvert.DeserializeObject<GetToDoListAssignmentDTO[]>(await getResponse.Content.ReadAsStringAsync());
-            var createdToDo = todos.FirstOrDefault(t => t.Description == "TestToUpdate");
-
-            createdToDo.Should().NotBeNull();
-
-            var updatedToDo = new ToDoListAssignmentDTO
-            {
-                Description = "Updated Description",
-                CreatedDate = createdToDo.CreatedDate,
-                CompletionStatus = true
-            };
-
-            var updatedSerializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(updatedToDo);
+            updateToDo.Description = "This is description after update";
+            var updatedSerializedObject = Newtonsoft.Json.JsonConvert.SerializeObject(updateToDo);
             var updateContent = new StringContent(updatedSerializedObject, Encoding.UTF8, "application/json");
-            HttpResponseMessage updateResponse = await _httpClient.PutAsync($"todo/{createdToDo.Id}", updateContent);
-            updateResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            HttpResponseMessage getUpdatedResponse = await _httpClient.GetAsync("todo");
-            getUpdatedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var updatedTodos = Newtonsoft.Json.JsonConvert.DeserializeObject<GetToDoListAssignmentDTO[]>(await getUpdatedResponse.Content.ReadAsStringAsync());
-            var updatedTask = updatedTodos.FirstOrDefault(t => t.Id == createdToDo.Id);
-
-            updatedTask.Should().NotBeNull();
-            updatedTask.Description.Should().Be("Updated Description");
-            updatedTask.CompletionStatus.Should().BeTrue();
-
+            HttpResponseMessage updateResponse = await _httpClient.PutAsync($"todo/{updateToDo.Id}", updateContent);
+            updateResponse
+                .StatusCode
+                .Should()
+                .Be(HttpStatusCode.OK);
+           
+            ToDoListAssignment afterUpdateobj = _context.ToDoListAssignments
+                .FirstOrDefault(t => t.Id == 1)
+                .Should().NotBeNull()
+                .And
+                .BeOfType<ToDoListAssignment>()
+                .Subject;
+            afterUpdateobj.Description.Should().Be("This is description after update");
         }
     }
 }

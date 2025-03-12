@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using TodoList.WebApi.Data;
 using TodoList.WebApi.Services;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,7 +25,6 @@ builder.Services.AddCors(c =>
 var app = builder.Build();
 app.UseStaticFiles();
 app.UseRouting();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

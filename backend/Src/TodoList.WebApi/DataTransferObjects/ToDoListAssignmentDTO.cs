@@ -5,7 +5,10 @@ namespace TodoList.WebApi.DataTransferObjects
 {
     public class ToDoListAssignmentDTO
     {
-        
+        [Key]
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(255)]
         [JsonPropertyName("description")]
