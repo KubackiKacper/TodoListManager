@@ -64,7 +64,8 @@ const ToDoForm = () => {
     } catch (error) {
       notify({ 
         type: TypeEnum.error, 
-        message: error });
+        message: "Something went wrong, could not update item!"  
+      });
     }
   };
   const handleDelete = async (id: number) => {
@@ -91,7 +92,7 @@ const ToDoForm = () => {
       notify({ 
         type: 
         TypeEnum.error, 
-        message: error 
+        message: "Something went wrong, could not delete item!" 
       });
     }
   };
@@ -111,8 +112,8 @@ const ToDoForm = () => {
       });
     } catch (error) {
       notify({ 
-        type: TypeEnum.success, 
-        message: error 
+        type: TypeEnum.error, 
+        message: "Something went wrong, could not add item!" 
       });
     }
   };

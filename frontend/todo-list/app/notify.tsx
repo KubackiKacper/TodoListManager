@@ -10,7 +10,7 @@ export enum TypeEnum {
 
 interface INotifyProps {
   type: TypeEnum;
-  message: string | any;
+  message: string
 }
 const defaultOptions = {
   position: 'top-left' as const,
