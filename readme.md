@@ -3,7 +3,7 @@
 ![til](/readme_photos/app.gif)
 
 ## Backend
-### This is my implementation of a To-Do list manager. The backend services are implemented using .NET Core Web API. For data storage, I decided to use an SQLite database and Entity Framework Core for manipulating data. After creating the migration, the database is seeded with one example To-Do assignment. I am using a Data Transfer Objects (DTO) to ensure that the original objects remains unchanged. My implementation revolves around the service *ToDoService*, which handles all business logic:
+### This is my implementation of a To-Do list manager. The backend services are implemented using .NET Core Web API. For data storage, I've decided to use a SQLite database because it's a lightweight database stored in file so there is no need to host a database and Entity Framework Core for manipulating data. After creating the migration, the database is seeded with two example To-Do assignment. I am using a Data Transfer Objects (DTO) to ensure that the original objects remains unchanged. My implementation revolves around the service *ToDoService*, which handles all business logic:
     -Creating a new To-Do task,
     -Reading existing To-Do tasks.
     -Updating an existing To-Do task,
