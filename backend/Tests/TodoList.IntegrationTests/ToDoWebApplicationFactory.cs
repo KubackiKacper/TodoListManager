@@ -33,7 +33,6 @@ namespace TodoList.IntegrationTests
 
                 services.Remove(dbConnectionDescriptor);
 
-                // Create open SqliteConnection so EF won't automatically close it.
                 services.AddSingleton<DbConnection>(container =>
                 {
                     var connection = new SqliteConnection("Data Source= TestToDo.db");
@@ -49,7 +48,7 @@ namespace TodoList.IntegrationTests
                 });
                 using var scope = services.BuildServiceProvider().CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                db.Database.EnsureCreated(); // Tworzy schemat bazy, jeśli nie istnieje
+                db.Database.EnsureCreated();
             });
 
             builder.UseEnvironment("Development");
