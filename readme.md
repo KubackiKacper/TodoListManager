@@ -1,4 +1,4 @@
-# TodoList Assignment  
+# To-Do List
 ## Preview:
 ![til](/readme_photos/app.gif)
 
